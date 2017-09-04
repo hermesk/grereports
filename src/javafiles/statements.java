@@ -83,7 +83,7 @@ public class statements extends javax.swing.JFrame {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/gakuyo.png"))); // NOI18N
 
-        property.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Land", "House" }));
+        property.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Land", "House", "Investors" }));
 
         id.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -232,6 +232,44 @@ public class statements extends javax.swing.JFrame {
                                                           }
                             else{
                            JOptionPane.showMessageDialog(null, "No House Record Found for "+" "+id.getText()+" ");
+
+                              }
+                                              id.setText("");
+
+                          }
+                          
+                   
+                    
+                } catch (JRException | SQLException ex) {
+                    Logger.getLogger(statements.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }
+             else if (property.getSelectedItem() == "Investors"){
+                try {
+                     String check ="SELECT COUNT(*) AS total FROM investors where id='"+id.getText()+"'"; 
+                            pst=conn.prepareStatement(check);
+                            rs = pst.executeQuery();
+                            
+                          while(rs.next()){
+                              
+                              if(rs.getInt("total")>0){
+                                      
+                         InputStream ljp = getClass().getResourceAsStream("investorstatement.jrxml");
+                         JasperDesign jd = JRXmlLoader.load(ljp);
+                         String hstatmnt = "select * from investors_details,investors\n" +
+                              "where investors.id='"+id.getText()+"' and investors_details.id='"+id.getText()+"'";
+
+          
+                        JRDesignQuery nq = new JRDesignQuery();
+                        nq.setText(hstatmnt);
+                        jd.setQuery(nq);
+                        JasperReport jr = JasperCompileManager.compileReport(jd);
+                        JasperPrint jp = JasperFillManager.fillReport(jr,null, conn);
+                        JasperViewer.viewReport(jp,false);
+                             
+                                                          }
+                            else{
+                           JOptionPane.showMessageDialog(null, "No Investors Record Found for "+" "+id.getText()+" ");
 
                               }
                                               id.setText("");
